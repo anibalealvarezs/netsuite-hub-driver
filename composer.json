@@ -1,0 +1,21 @@
+{
+    "name": "anibalealvarezs/netsuite-hub-driver",
+    "description": "NetSuite driver for the Hub ecosystem",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Aníbal Álvarez",
+            "email": "anibalealvarezs@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "anibalealvarezs/api-client-skeleton": "dev-main",
+        "anibalealvarezs/netsuite-api": "dev-main"
+    },
+    "autoload": {
+        "psr-4": {
+            "Anibalealvarezs\\NetSuiteHubDriver\\": "src/"
+        }
+    }
+}
