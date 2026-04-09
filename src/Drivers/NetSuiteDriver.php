@@ -4,6 +4,7 @@ namespace Anibalealvarezs\NetSuiteHubDriver\Drivers;
 
 use Anibalealvarezs\ApiSkeleton\Interfaces\SyncDriverInterface;
 use Anibalealvarezs\ApiSkeleton\Interfaces\AuthProviderInterface;
+use Anibalealvarezs\ApiSkeleton\Traits\HasUpdatableCredentials;
 use Anibalealvarezs\NetSuiteApi\NetSuiteApi;
 use Anibalealvarezs\NetSuiteApi\Conversions\NetSuiteConvert;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,6 +14,8 @@ use Exception;
 
 class NetSuiteDriver implements SyncDriverInterface
 {
+    use HasUpdatableCredentials;
+
     private ?AuthProviderInterface $authProvider = null;
     private ?LoggerInterface $logger = null;
     /** @var callable|null */
@@ -164,4 +167,12 @@ class NetSuiteDriver implements SyncDriverInterface
             accountId: $creds['account_id']
         );
     }
+
+    public array $updatableCredentials = [
+        'NETSUITE_CONSUMER_ID',
+        'NETSUITE_CONSUMER_SECRET',
+        'NETSUITE_TOKEN_ID',
+        'NETSUITE_TOKEN_SECRET',
+        'NETSUITE_ACCOUNT_ID'
+    ];
 }
