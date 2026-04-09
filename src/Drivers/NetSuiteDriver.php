@@ -149,4 +149,19 @@ class NetSuiteDriver implements SyncDriverInterface
         $url = str_replace(['http://', 'https://'], '', $url);
         return explode('/', $url)[0];
     }
+
+    public function getApi(array $config = []): NetSuiteApi
+    {
+        /** @var \Anibalealvarezs\NetSuiteHubDriver\Auth\NetSuiteAuthProvider $auth */
+        $auth = $this->authProvider;
+        $creds = $auth->getCredentials();
+        
+        return new NetSuiteApi(
+            consumerId: $creds['consumer_id'],
+            consumerSecret: $creds['consumer_secret'],
+            token: $creds['token_id'],
+            tokenSecret: $creds['token_secret'],
+            accountId: $creds['account_id']
+        );
+    }
 }
