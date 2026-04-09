@@ -5,6 +5,7 @@ namespace Anibalealvarezs\NetSuiteHubDriver\Drivers;
 use Anibalealvarezs\ApiSkeleton\Interfaces\SyncDriverInterface;
 use Anibalealvarezs\ApiSkeleton\Interfaces\AuthProviderInterface;
 use Anibalealvarezs\NetSuiteApi\NetSuiteApi;
+use Anibalealvarezs\NetSuiteApi\Conversions\NetSuiteConvert;
 use Symfony\Component\HttpFoundation\Response;
 use Psr\Log\LoggerInterface;
 use DateTime;
@@ -26,6 +27,11 @@ class NetSuiteDriver implements SyncDriverInterface
     public function setAuthProvider(AuthProviderInterface $provider): void
     {
         $this->authProvider = $provider;
+    }
+
+    public function getAuthProvider(): ?AuthProviderInterface
+    {
+        return $this->authProvider;
     }
 
     public function setDataProcessor(callable $processor): void
@@ -69,17 +75,17 @@ class NetSuiteDriver implements SyncDriverInterface
 
             // 1. Sync Customers
             if ($type === 'all' || $type === 'customers') {
-                $this->syncCustomers($api, $startDate, $endDate, $config);
+                $this->syncCustomers($api, $startDate, $endDate);
             }
 
             // 2. Sync Orders
             if ($type === 'all' || $type === 'orders') {
-                $this->syncOrders($api, $startDate, $endDate, $config, $creds);
+                $this->syncOrders($api, $startDate, $endDate, $creds);
             }
 
             // 3. Sync Products
             if ($type === 'all' || $type === 'products') {
-                $this->syncProducts($api, $config, $creds);
+                $this->syncProducts($api, $creds);
             }
 
             return new Response(json_encode(['status' => 'success', 'message' => 'NetSuite sync completed']));
@@ -92,51 +98,48 @@ class NetSuiteDriver implements SyncDriverInterface
         }
     }
 
-    private function syncCustomers(NetSuiteApi $api, DateTime $start, DateTime $end, array $config): void
+    private function syncCustomers(NetSuiteApi $api, DateTime $start, DateTime $end): void
     {
         if ($this->logger) $this->logger->info("Syncing NetSuite Customers...");
         $query = "SELECT Customer.email, Customer.entityid, Customer.firstname, Customer.id AS customerid, Customer.lastname, Entity.datecreated, Entity.id AS entityid, Entity.isinactive FROM Customer INNER JOIN Entity ON Entity.customer = Customer.id WHERE Entity.datecreated >= TO_DATE('". $start->format('m/d/Y') ."', 'mm/dd/yyyy') AND Entity.datecreated <= TO_DATE('". $end->format('m/d/Y') ."', 'mm/dd/yyyy')";
         $api->getSuiteQLQueryAllAndProcess(
             query: $query,
-            callback: function ($customers) use ($config) {
-                ($this->dataProcessor)(
-                    data: $customers,
-                    type: 'customers',
-                    config: $config
-                );
+            callback: function ($customers) {
+                $collection = NetSuiteConvert::customers($customers);
+                if ($this->dataProcessor && $collection->count() > 0) {
+                    ($this->dataProcessor)($collection, $this->logger);
+                }
             }
         );
     }
 
-    private function syncOrders(NetSuiteApi $api, DateTime $start, DateTime $end, array $config, array $creds): void
+    private function syncOrders(NetSuiteApi $api, DateTime $start, DateTime $end, array $creds): void
     {
         if ($this->logger) $this->logger->info("Syncing NetSuite Orders...");
         $domain = $this->getDomain($creds['store_base_url'] ?? '');
         $query = "SELECT transaction.*, entity.customer as CustomerID FROM transaction INNER JOIN entity ON entity.id = transaction.entity WHERE transaction.type = 'SalesOrd' AND transaction.custbody_division_domain = '$domain' AND transaction.trandate >= TO_DATE('". $start->format('m/d/Y') ."', 'mm/dd/yyyy')";
         $api->getSuiteQLQueryAllAndProcess(
             query: $query,
-            callback: function ($orders) use ($config) {
-                ($this->dataProcessor)(
-                    data: $orders,
-                    type: 'orders',
-                    config: $config
-                );
+            callback: function ($orders) {
+                $collection = NetSuiteConvert::orders($orders);
+                if ($this->dataProcessor && $collection->count() > 0) {
+                    ($this->dataProcessor)($collection, $this->logger);
+                }
             }
         );
     }
 
-    private function syncProducts(NetSuiteApi $api, array $config, array $creds): void
+    private function syncProducts(NetSuiteApi $api, array $creds): void
     {
         if ($this->logger) $this->logger->info("Syncing NetSuite Products...");
         $query = "SELECT Item.* FROM Item WHERE Item.isinactive = 'F'";
         $api->getSuiteQLQueryAllAndProcess(
             query: $query,
-            callback: function ($products) use ($config) {
-                ($this->dataProcessor)(
-                    data: $products,
-                    type: 'products',
-                    config: $config
-                );
+            callback: function ($products) {
+                $collection = NetSuiteConvert::products($products);
+                if ($this->dataProcessor && $collection->count() > 0) {
+                    ($this->dataProcessor)($collection, $this->logger);
+                }
             }
         );
     }
