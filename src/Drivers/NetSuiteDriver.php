@@ -168,6 +168,33 @@ class NetSuiteDriver implements SyncDriverInterface
         );
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function getConfigSchema(): array
+    {
+        return [
+            'global' => [
+                'enabled' => true,
+                'cache_history_range' => '1 year',
+                'cache_aggregations' => false,
+            ],
+            'entity' => [
+                'id' => '',
+                'name' => '',
+                'enabled' => true,
+            ]
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function validateConfig(array $config): array
+    {
+        return $config;
+    }
+
     public array $updatableCredentials = [
         'NETSUITE_CONSUMER_ID',
         'NETSUITE_CONSUMER_SECRET',
