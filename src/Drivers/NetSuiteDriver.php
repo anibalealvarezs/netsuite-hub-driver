@@ -6,7 +6,7 @@ use Anibalealvarezs\ApiDriverCore\Interfaces\SyncDriverInterface;
 use Anibalealvarezs\ApiDriverCore\Interfaces\AuthProviderInterface;
 use Anibalealvarezs\ApiDriverCore\Traits\HasUpdatableCredentials;
 use Anibalealvarezs\NetSuiteApi\NetSuiteApi;
-use Anibalealvarezs\NetSuiteApi\Conversions\NetSuiteConvert;
+use Anibalealvarezs\NetSuiteHubDriver\Conversions\NetSuiteConvert;
 use Symfony\Component\HttpFoundation\Response;
 use Psr\Log\LoggerInterface;
 use DateTime;
