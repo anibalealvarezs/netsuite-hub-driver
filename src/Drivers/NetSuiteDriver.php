@@ -47,6 +47,16 @@ class NetSuiteDriver implements SyncDriverInterface
         return 'NetSuite';
     }
 
+    /**
+     * Get the routes served by this driver.
+     * 
+     * @return array
+     */
+    public static function getRoutes(): array
+    {
+        return [];
+    }
+
     public static function getCommonConfigKey(): ?string
     {
         return null;
