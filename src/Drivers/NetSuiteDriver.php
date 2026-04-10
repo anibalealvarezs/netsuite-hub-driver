@@ -2,16 +2,16 @@
 
 namespace Anibalealvarezs\NetSuiteHubDriver\Drivers;
 
-use Anibalealvarezs\ApiSkeleton\Interfaces\SyncDriverInterface;
-use Anibalealvarezs\ApiSkeleton\Interfaces\AuthProviderInterface;
-use Anibalealvarezs\ApiSkeleton\Traits\HasUpdatableCredentials;
+use Anibalealvarezs\ApiDriverCore\Interfaces\SyncDriverInterface;
+use Anibalealvarezs\ApiDriverCore\Interfaces\AuthProviderInterface;
+use Anibalealvarezs\ApiDriverCore\Traits\HasUpdatableCredentials;
 use Anibalealvarezs\NetSuiteApi\NetSuiteApi;
 use Anibalealvarezs\NetSuiteApi\Conversions\NetSuiteConvert;
 use Symfony\Component\HttpFoundation\Response;
 use Psr\Log\LoggerInterface;
 use DateTime;
 use Exception;
-use Anibalealvarezs\ApiSkeleton\Interfaces\SeederInterface;
+use Anibalealvarezs\ApiDriverCore\Interfaces\SeederInterface;
 
 class NetSuiteDriver implements SyncDriverInterface
 {
@@ -213,6 +213,11 @@ class NetSuiteDriver implements SyncDriverInterface
     ];
     public function boot(): void
     {
+    }
+
+    public function getAssetPatterns(): array
+    {
+        return [];
     }
 }
 
