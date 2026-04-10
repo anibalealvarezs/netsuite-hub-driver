@@ -15,6 +15,11 @@ use Anibalealvarezs\ApiDriverCore\Interfaces\SeederInterface;
 
 class NetSuiteDriver implements SyncDriverInterface
 {
+
+    public static function getCommonConfigKey(): ?string
+    {
+        return null;
+    }
     use HasUpdatableCredentials;
 
     private ?AuthProviderInterface $authProvider = null;
