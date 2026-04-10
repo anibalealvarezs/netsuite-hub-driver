@@ -211,4 +211,8 @@ class NetSuiteDriver implements SyncDriverInterface
         'NETSUITE_TOKEN_SECRET',
         'NETSUITE_ACCOUNT_ID'
     ];
+    public function boot(): void
+    {
+    }
 }
+
