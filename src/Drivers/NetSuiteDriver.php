@@ -16,6 +16,17 @@ use Anibalealvarezs\ApiDriverCore\Interfaces\SeederInterface;
 class NetSuiteDriver implements SyncDriverInterface
 {
 
+    /**
+     * Store credentials for this driver.
+     * 
+     * @param array $credentials
+     * @return void
+     */
+    public static function storeCredentials(array $credentials): void
+    {
+        // No implementation needed for this driver
+    }
+
     public static function getCommonConfigKey(): ?string
     {
         return null;
