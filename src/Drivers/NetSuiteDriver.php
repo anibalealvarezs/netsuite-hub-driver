@@ -3,8 +3,8 @@
 namespace Anibalealvarezs\NetSuiteHubDriver\Drivers;
 
 use Anibalealvarezs\ApiDriverCore\Interfaces\SyncDriverInterface;
-use Anibalealvarezs\ApiDriverCore\Interfaces\AuthProviderInterface;
-use Anibalealvarezs\ApiDriverCore\Traits\HasUpdatableCredentials;
+use Anibalealvarezs\ApiSkeleton\Interfaces\AuthProviderInterface;
+use Anibalealvarezs\ApiSkeleton\Traits\HasUpdatableCredentials;
 use Anibalealvarezs\NetSuiteApi\NetSuiteApi;
 use Anibalealvarezs\NetSuiteHubDriver\Conversions\NetSuiteConvert;
 use Symfony\Component\HttpFoundation\Response;

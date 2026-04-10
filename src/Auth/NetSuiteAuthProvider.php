@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Anibalealvarezs\NetSuiteHubDriver\Auth;
 
-use Anibalealvarezs\ApiDriverCore\Auth\BaseAuthProvider;
+use Anibalealvarezs\ApiSkeleton\Auth\BaseAuthProvider;
 
 class NetSuiteAuthProvider extends BaseAuthProvider
 {
