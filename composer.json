@@ -4,7 +4,7 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Aníbal Álvarez",
+            "name": "An\u00edbal \u00c1lvarez",
             "email": "anibalealvarezs@gmail.com"
         }
     ],
@@ -12,8 +12,9 @@
         "php": ">=8.1",
         "anibalealvarezs/api-client-skeleton": "dev-main",
         "anibalealvarezs/netsuite-api": "dev-main",
-        "psr/log": "^3.0",
-        "symfony/http-foundation": "^6.0"
+        "psr/log": "^1.0 || ^2.0 || ^3.0",
+        "symfony/http-foundation": "^6.0 || ^7.0",
+        "anibalealvarezs/api-driver-core": "dev-main"
     },
     "repositories": [
         {

@@ -3,8 +3,8 @@
 namespace Anibalealvarezs\NetSuiteHubDriver\Drivers;
 
 use Anibalealvarezs\ApiDriverCore\Interfaces\SyncDriverInterface;
-use Anibalealvarezs\ApiSkeleton\Interfaces\AuthProviderInterface;
-use Anibalealvarezs\ApiSkeleton\Traits\HasUpdatableCredentials;
+use Anibalealvarezs\ApiDriverCore\Interfaces\AuthProviderInterface;
+use Anibalealvarezs\ApiDriverCore\Traits\HasUpdatableCredentials;
 use Anibalealvarezs\NetSuiteApi\NetSuiteApi;
 use Anibalealvarezs\NetSuiteHubDriver\Conversions\NetSuiteConvert;
 use Symfony\Component\HttpFoundation\Response;
@@ -55,6 +55,26 @@ class NetSuiteDriver implements SyncDriverInterface
     public static function getRoutes(): array
     {
         return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function fetchAvailableAssets(): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function validateAuthentication(): array
+    {
+        return [
+            'success' => true,
+            'message' => 'Status unknown for this driver.',
+            'details' => []
+        ];
     }
 
     public static function getCommonConfigKey(): ?string
@@ -262,6 +282,32 @@ class NetSuiteDriver implements SyncDriverInterface
     }
 
     public function getAssetPatterns(): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function initializeEntities(mixed $entityManager, array $config = []): array
+    {
+        return ['initialized' => 0, 'skipped' => 0];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function reset(mixed $entityManager, string $mode = 'all', array $config = []): array
+    {
+        return ['cleared' => 0, 'mode' => $mode];
+    }
+
+    public function updateConfiguration(array $newData, array $currentConfig): array
+    {
+        return $currentConfig;
+    }
+
+    public function prepareUiConfig(array $channelConfig): array
     {
         return [];
     }
