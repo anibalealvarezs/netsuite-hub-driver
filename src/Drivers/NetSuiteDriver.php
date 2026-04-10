@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Psr\Log\LoggerInterface;
 use DateTime;
 use Exception;
+use Anibalealvarezs\ApiSkeleton\Interfaces\SeederInterface;
 
 class NetSuiteDriver implements SyncDriverInterface
 {
@@ -193,6 +194,14 @@ class NetSuiteDriver implements SyncDriverInterface
     public function validateConfig(array $config): array
     {
         return $config;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function seedDemoData(SeederInterface $seeder, array $config = []): void
+    {
+        // Placeholder for future implementation
     }
 
     public array $updatableCredentials = [
