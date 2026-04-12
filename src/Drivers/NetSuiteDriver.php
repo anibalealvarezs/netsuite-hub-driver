@@ -12,9 +12,11 @@ use Psr\Log\LoggerInterface;
 use DateTime;
 use Exception;
 use Anibalealvarezs\ApiDriverCore\Interfaces\SeederInterface;
+use Anibalealvarezs\ApiDriverCore\Traits\SyncDriverTrait;
 
 class NetSuiteDriver implements SyncDriverInterface
 {
+    use SyncDriverTrait;
 
     /**
      * Store credentials for this driver.
@@ -47,11 +49,6 @@ class NetSuiteDriver implements SyncDriverInterface
         return 'NetSuite';
     }
 
-    /**
-     * Get the display icon for the channel.
-     * 
-     * @return string
-     */
     public static function getChannelIcon(): string
     {
         return 'NS';
@@ -87,10 +84,7 @@ class NetSuiteDriver implements SyncDriverInterface
         ];
     }
 
-    public static function getCommonConfigKey(): ?string
-    {
-        return null;
-    }
+
     use HasUpdatableCredentials;
 
     private ?AuthProviderInterface $authProvider = null;
@@ -168,6 +162,11 @@ class NetSuiteDriver implements SyncDriverInterface
                 $this->syncProducts($api, $creds);
             }
 
+            // 4. Sync Product Categories
+            if ($type === 'all' || $type === 'product_categories') {
+                $this->syncProductCategories($api, $config);
+            }
+
             return new Response(json_encode(['status' => 'success', 'message' => 'NetSuite sync completed']));
 
         } catch (Exception $e) {
@@ -217,6 +216,22 @@ class NetSuiteDriver implements SyncDriverInterface
             query: $query,
             callback: function ($products) {
                 $collection = NetSuiteConvert::products($products);
+                if ($this->dataProcessor && $collection->count() > 0) {
+                    ($this->dataProcessor)($collection, $this->logger);
+                }
+            }
+        );
+    }
+
+    private function syncProductCategories(NetSuiteApi $api, array $config): void
+    {
+        if ($this->logger) $this->logger->info("Syncing NetSuite Product Categories...");
+        $sinceId = $config['sinceId'] ?? 0;
+        $query = "SELECT * FROM CommerceCategory WHERE id >= " . $sinceId . " ORDER BY id ASC";
+        $api->getSuiteQLQueryAllAndProcess(
+            query: $query,
+            callback: function ($productCategories) {
+                $collection = NetSuiteConvert::productCategories($productCategories);
                 if ($this->dataProcessor && $collection->count() > 0) {
                     ($this->dataProcessor)($collection, $this->logger);
                 }
@@ -296,6 +311,8 @@ class NetSuiteDriver implements SyncDriverInterface
         return [];
     }
 
+
+
     /**
      * @inheritdoc
      */
@@ -316,10 +333,19 @@ class NetSuiteDriver implements SyncDriverInterface
     {
         return $currentConfig;
     }
-
     public function prepareUiConfig(array $channelConfig): array
     {
         return [];
+    }
+    /**
+     * @inheritdoc
+     */
+    public function getDateFilterMapping(): array
+    {
+        return [
+            'start' => 'createdAtMin',
+            'end' => 'createdAtMax'
+        ];
     }
 }
 
