@@ -18,6 +18,15 @@ class NetSuiteAuthProvider extends BaseAuthProvider
         return $this->data['netsuite_auth']['user_id'] ?? "";
     }
 
+    public function setAccessToken(string $token): void
+    {
+        if (!isset($this->data['netsuite_auth'])) {
+            $this->data['netsuite_auth'] = [];
+        }
+        $this->data['netsuite_auth']['token_id'] = $token;
+        $this->save();
+    }
+
     public function getCredentials(): array
     {
         return $this->data['netsuite_auth'] ?? [];
