@@ -149,17 +149,17 @@ class NetSuiteDriver implements SyncDriverInterface
 
             // 1. Sync Customers
             if ($type === 'all' || $type === 'customers') {
-                $this->syncCustomers($api, $startDate, $endDate);
+                $this->syncCustomers($api, $startDate, $endDate, $config);
             }
 
             // 2. Sync Orders
             if ($type === 'all' || $type === 'orders') {
-                $this->syncOrders($api, $startDate, $endDate, $creds);
+                $this->syncOrders($api, $startDate, $endDate, $creds, $config);
             }
 
             // 3. Sync Products
             if ($type === 'all' || $type === 'products') {
-                $this->syncProducts($api, $creds);
+                $this->syncProducts($api, $creds, $config);
             }
 
             // 4. Sync Product Categories
@@ -177,13 +177,14 @@ class NetSuiteDriver implements SyncDriverInterface
         }
     }
 
-    private function syncCustomers(NetSuiteApi $api, DateTime $start, DateTime $end): void
+    private function syncCustomers(NetSuiteApi $api, DateTime $start, DateTime $end, array $config): void
     {
         if ($this->logger) $this->logger->info("Syncing NetSuite Customers...");
-        $query = "SELECT Customer.email, Customer.entityid, Customer.firstname, Customer.id AS customerid, Customer.lastname, Entity.datecreated, Entity.id AS entityid, Entity.isinactive FROM Customer INNER JOIN Entity ON Entity.customer = Customer.id WHERE Entity.datecreated >= TO_DATE('". $start->format('m/d/Y') ."', 'mm/dd/yyyy') AND Entity.datecreated <= TO_DATE('". $end->format('m/d/Y') ."', 'mm/dd/yyyy')";
+        $query = "SELECT Customer.email, Customer.entityid, Customer.firstname, Customer.id AS customerid, Customer.lastname, Entity.datecreated, Entity.id AS entityid, Entity.isinactive FROM Customer INNER JOIN Entity ON Entity.customer = Customer.id WHERE Entity.datecreated >= TO_DATE('" . $start->format('m/d/Y') . "', 'mm/dd/yyyy') AND Entity.datecreated <= TO_DATE('" . $end->format('m/d/Y') . "', 'mm/dd/yyyy')";
         $api->getSuiteQLQueryAllAndProcess(
             query: $query,
-            callback: function ($customers) {
+            callback: function ($customers) use ($config) {
+                $this->checkJobStatus($config);
                 $collection = NetSuiteConvert::customers($customers);
                 if ($this->dataProcessor && $collection->count() > 0) {
                     ($this->dataProcessor)($collection, $this->logger);
@@ -192,14 +193,15 @@ class NetSuiteDriver implements SyncDriverInterface
         );
     }
 
-    private function syncOrders(NetSuiteApi $api, DateTime $start, DateTime $end, array $creds): void
+    private function syncOrders(NetSuiteApi $api, DateTime $start, DateTime $end, array $creds, array $config): void
     {
         if ($this->logger) $this->logger->info("Syncing NetSuite Orders...");
         $domain = $this->getDomain($creds['store_base_url'] ?? '');
-        $query = "SELECT transaction.*, entity.customer as CustomerID FROM transaction INNER JOIN entity ON entity.id = transaction.entity WHERE transaction.type = 'SalesOrd' AND transaction.custbody_division_domain = '$domain' AND transaction.trandate >= TO_DATE('". $start->format('m/d/Y') ."', 'mm/dd/yyyy')";
+        $query = "SELECT transaction.*, entity.customer as CustomerID FROM transaction INNER JOIN entity ON entity.id = transaction.entity WHERE transaction.type = 'SalesOrd' AND transaction.custbody_division_domain = '$domain' AND transaction.trandate >= TO_DATE('" . $start->format('m/d/Y') . "', 'mm/dd/yyyy')";
         $api->getSuiteQLQueryAllAndProcess(
             query: $query,
-            callback: function ($orders) {
+            callback: function ($orders) use ($config) {
+                $this->checkJobStatus($config);
                 $collection = NetSuiteConvert::orders($orders);
                 if ($this->dataProcessor && $collection->count() > 0) {
                     ($this->dataProcessor)($collection, $this->logger);
@@ -208,13 +210,14 @@ class NetSuiteDriver implements SyncDriverInterface
         );
     }
 
-    private function syncProducts(NetSuiteApi $api, array $creds): void
+    private function syncProducts(NetSuiteApi $api, array $creds, array $config): void
     {
         if ($this->logger) $this->logger->info("Syncing NetSuite Products...");
         $query = "SELECT Item.* FROM Item WHERE Item.isinactive = 'F'";
         $api->getSuiteQLQueryAllAndProcess(
             query: $query,
-            callback: function ($products) {
+            callback: function ($products) use ($config) {
+                $this->checkJobStatus($config);
                 $collection = NetSuiteConvert::products($products);
                 if ($this->dataProcessor && $collection->count() > 0) {
                     ($this->dataProcessor)($collection, $this->logger);
@@ -230,7 +233,8 @@ class NetSuiteDriver implements SyncDriverInterface
         $query = "SELECT * FROM CommerceCategory WHERE id >= " . $sinceId . " ORDER BY id ASC";
         $api->getSuiteQLQueryAllAndProcess(
             query: $query,
-            callback: function ($productCategories) {
+            callback: function ($productCategories) use ($config) {
+                $this->checkJobStatus($config);
                 $collection = NetSuiteConvert::productCategories($productCategories);
                 if ($this->dataProcessor && $collection->count() > 0) {
                     ($this->dataProcessor)($collection, $this->logger);
