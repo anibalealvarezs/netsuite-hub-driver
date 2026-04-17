@@ -118,7 +118,14 @@ class NetSuiteDriver implements SyncDriverInterface
         return 'netsuite';
     }
 
-    public function sync(DateTime $startDate, DateTime $endDate, array $config = []): Response
+    public function sync(
+        DateTime $startDate,
+        DateTime $endDate,
+        array $config = [],
+        ?callable $shouldContinue = null,
+        ?callable $identityMapper = null
+    ): Response
+
     {
         if (!$this->authProvider) {
             throw new Exception("AuthProvider not set for NetSuiteDriver");
@@ -325,7 +332,8 @@ class NetSuiteDriver implements SyncDriverInterface
     /**
      * @inheritdoc
      */
-    public function initializeEntities(mixed $entityManager, array $config = []): array
+    public function initializeEntities(array $config = []): array
+
     {
         return ['initialized' => 0, 'skipped' => 0];
     }
@@ -333,7 +341,8 @@ class NetSuiteDriver implements SyncDriverInterface
     /**
      * @inheritdoc
      */
-    public function reset(mixed $entityManager, string $mode = 'all', array $config = []): array
+    public function reset(string $mode = 'all', array $config = []): array
+
     {
         return ['cleared' => 0, 'mode' => $mode];
     }
