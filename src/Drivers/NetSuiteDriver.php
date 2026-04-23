@@ -85,7 +85,6 @@ class NetSuiteDriver implements SyncDriverInterface
     }
 
 
-    use HasUpdatableCredentials;
 
     private ?AuthProviderInterface $authProvider = null;
     private ?LoggerInterface $logger = null;
