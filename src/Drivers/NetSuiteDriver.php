@@ -13,10 +13,24 @@ use DateTime;
 use Exception;
 use Anibalealvarezs\ApiDriverCore\Interfaces\SeederInterface;
 use Anibalealvarezs\ApiDriverCore\Traits\SyncDriverTrait;
+use Anibalealvarezs\ApiDriverCore\Interfaces\CanonicalMetricDictionaryProviderInterface;
+use Anibalealvarezs\ApiDriverCore\Interfaces\AggregationProfileProviderInterface;
+use Anibalealvarezs\ApiDriverCore\Classes\AggregationProfileTemplates;
 
-class NetSuiteDriver implements SyncDriverInterface
+class NetSuiteDriver implements SyncDriverInterface, CanonicalMetricDictionaryProviderInterface, AggregationProfileProviderInterface
 {
     use SyncDriverTrait;
+
+    public static function getAggregationProfiles(): array
+    {
+        return [
+            AggregationProfileTemplates::storeProfile(
+                channel: 'netsuite',
+                key: 'netsuite_performance',
+                label: 'NetSuite Performance'
+            ),
+        ];
+    }
 
     /**
      * Store credentials for this driver.
@@ -324,6 +338,21 @@ class NetSuiteDriver implements SyncDriverInterface
     public static function getAssetPatterns(): array
     {
         return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getCanonicalMetricDictionary(): array
+    {
+        return [
+            'conversions' => ['SalesOrd'],
+        ];
+    }
+
+    public static function getPlatformEntityIdField(): string
+    {
+        return 'account_id';
     }
 
 
