@@ -91,6 +91,14 @@ class NetSuiteDriver implements SyncDriverInterface, CanonicalMetricDictionaryPr
      */
     public function validateAuthentication(): array
     {
+        if (!$this->authProvider || !$this->authProvider->hasCredentials()) {
+            return [
+                'success' => false,
+                'message' => 'Credentials not configured.',
+                'details' => []
+            ];
+        }
+
         return [
             'success' => true,
             'message' => 'Status unknown for this driver.',
@@ -271,6 +279,10 @@ class NetSuiteDriver implements SyncDriverInterface, CanonicalMetricDictionaryPr
 
     public function getApi(array $config = []): NetSuiteApi
     {
+        if (!$this->authProvider || !$this->authProvider->hasCredentials()) {
+            throw new \Exception("Credentials not configured.");
+        }
+
         /** @var \Anibalealvarezs\NetSuiteHubDriver\Auth\NetSuiteAuthProvider $auth */
         $auth = $this->authProvider;
         $creds = $auth->getCredentials();
