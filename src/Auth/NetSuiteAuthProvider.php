@@ -37,4 +37,14 @@ class NetSuiteAuthProvider extends BaseAuthProvider
         $this->data['netsuite_auth'] = $credentials;
         $this->save();
     }
+
+    public function hasCredentials(): bool
+    {
+        $creds = $this->getCredentials();
+        return !empty($creds['consumer_id']) 
+            && !empty($creds['consumer_secret']) 
+            && !empty($creds['token_id']) 
+            && !empty($creds['token_secret']) 
+            && !empty($creds['account_id']);
+    }
 }
